@@ -2,28 +2,43 @@ import React, { Component } from 'react'
 import { render } from 'react-dom'
 import { Router, Route, IndexRoute, Link, IndexLink, browserHistory } from 'react-router'
 
-const ACTIVE = { color: 'red' }
+import withExampleBasename from '../withExampleBasename'
+const ACTIVE = {color: 'red'}
 
-class App extends Component {
+class App extends React.Component {
   render() {
     return (
       <div>
-        <h1>APP!</h1>
+        <h1>this is my first App!</h1>
         <ul>
-          <li><Link      to="/"           activeStyle={ACTIVE}>/</Link></li>
-          <li><IndexLink to="/"           activeStyle={ACTIVE}>/ IndexLink</IndexLink></li>
-
-          <li><Link      to="/users"      activeStyle={ACTIVE}>/users</Link></li>
-          <li><IndexLink to="/users"      activeStyle={ACTIVE}>/users IndexLink</IndexLink></li>
-
-          <li><Link      to="/users/ryan" activeStyle={ACTIVE}>/users/ryan</Link></li>
-          <li><Link      to={{ pathname: '/users/ryan', query: { foo: 'bar' } }}
-                                          activeStyle={ACTIVE}>/users/ryan?foo=bar</Link></li>
-
-          <li><Link      to="/about"      activeStyle={ACTIVE}>/about</Link></li>
+          <li>
+            <Link to="/"  activeStyle={ACTIVE}>/</Link>
+          </li>
+          <li>
+            <Link to="/about"  activeStyle={ACTIVE}>/About</Link>
+          </li>
+          <li>
+            <Link to="/users"  activeStyle={ACTIVE}>/Users</Link>
+          </li>
+          <li>
+            <IndexLink to="/users/sdfghjk"  activeStyle={ACTIVE}>/Sdfghjk</IndexLink>
+          </li>
+          <li>
+            <Link to={{ pathname: '/users/sdfghjk', query: { foo: 'bar',hoge:'piyo' } }}  activeStyle={ACTIVE}>/Users/child?has_query</Link>
+          </li>
         </ul>
-
         {this.props.children}
+      </div>
+    )
+  }
+}
+
+
+class About extends React.Component {
+  render() {
+    return (
+      <div>
+        <h2>About</h2>
       </div>
     )
   }
@@ -32,9 +47,7 @@ class App extends Component {
 class Index extends React.Component {
   render() {
     return (
-      <div>
-        <h2>Index!</h2>
-      </div>
+      <h2>Index</h2>
     )
   }
 }
@@ -50,44 +63,36 @@ class Users extends React.Component {
   }
 }
 
+class User extends React.Component {
+  render() {
+    var url_query = this.props.location.query
+    return (
+      <div>
+        <h4>User name is {this.props.params.name}</h4>
+        <p>url_query is {url_query.foo}</p>
+      </div>
+    )
+  }
+}
+
 class UsersIndex extends React.Component {
   render() {
     return (
       <div>
-        <h3>UsersIndex</h3>
-      </div>
-    )
-  }
-}
-
-class User extends React.Component {
-  render() {
-    return (
-      <div>
-        <h3>User {this.props.params.id}</h3>
-      </div>
-    )
-  }
-}
-
-class About extends React.Component {
-  render() {
-    return (
-      <div>
-        <h2>About</h2>
+        <h3>UsersIndexやで</h3>
       </div>
     )
   }
 }
 
 render((
-  <Router history={browserHistory}>
+  <Router history={withExampleBasename(browserHistory, __dirname)}>
     <Route path="/" component={App}>
       <IndexRoute component={Index}/>
       <Route path="/about" component={About}/>
       <Route path="users" component={Users}>
         <IndexRoute component={UsersIndex}/>
-        <Route path=":id" component={User}/>
+        <Route path=":name" component={User}/>
       </Route>
     </Route>
   </Router>
