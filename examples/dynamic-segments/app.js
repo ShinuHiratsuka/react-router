@@ -3,27 +3,39 @@ import { render } from 'react-dom'
 import { browserHistory, Router, Route, Link, Redirect } from 'react-router'
 
 import withExampleBasename from '../withExampleBasename'
+const App = ({ children }) => {
+  return (
+    <div>
+      <ul>
+        <li>
+          <Link to="/user/123" activeClassName="active">Bob</Link>
+        </li>
+        <li>
+          <Link to="/user/abc" activeClassName="active">Sally</Link>
+        </li>
+      </ul>
+      <div>this is home</div>
+      {children}
+    </div>
+  )
+}
 
-const App = ({ children }) => (
-  <div>
-    <ul>
-      <li><Link to="/user/123" activeClassName="active">Bob</Link></li>
-      <li><Link to="/user/abc" activeClassName="active">Sally</Link></li>
-    </ul>
-    {children}
-  </div>
-)
-
-const User = ({ children, params: { userID } }) => (
-  <div className="User">
-    <h1>User id: {userID}</h1>
-    <ul>
-      <li><Link to={`/user/${userID}/tasks/foo`} activeClassName="active">foo task</Link></li>
-      <li><Link to={`/user/${userID}/tasks/bar`} activeClassName="active">bar task</Link></li>
-    </ul>
-    {children}
-  </div>
-)
+const User = function({ children, params: { userID } }) {
+  return (
+    <div className="User">
+      <h1>User id is {userID}</h1>
+      <ul>
+        <li>
+          <Link to={`/user/${userID}/tasks/foo`} activeClassName="active">foo task</Link>
+        </li>
+        <li>
+          <Link to={`/user/${userID}/tasks/bar`} activeClassName="active">bar task</Link>
+        </li>
+      </ul>
+      {children}
+    </div>
+  )
+}
 
 const Task = ({ params: { userID, taskID } }) => (
   <div className="Task">
