@@ -5,71 +5,69 @@ import { browserHistory, Router, Route, Link, withRouter } from 'react-router'
 import withExampleBasename from '../withExampleBasename'
 
 const App = React.createClass({
-  render() {
+  render () {
     return (
       <div>
-        <ul>
-          <li><Link to="/dashboard" activeClassName="active">Dashboard</Link></li>
-          <li><Link to="/form" activeClassName="active">Form</Link></li>
-        </ul>
+        <div>
+          <ul>
+            <li>
+              <Link to="/dashboard" activeClassName="active">Dashboard</Link>
+            </li>
+            <li>
+              <Link to="/form" activeClassName="active">Form</Link>
+            </li>
+          </ul>
+        </div>
         {this.props.children}
       </div>
     )
   }
 })
 
-const Dashboard = React.createClass({
-  render() {
-    return <h1>Dashboard</h1>
+const Dashbord = React.createClass({
+  render () {
+    return <h1>Dashbord</h1>
   }
 })
 
 const Form = withRouter(
   React.createClass({
-
+    getInitialState() {
+      return {
+        text: 'ohai'
+      }
+    },
     componentWillMount() {
       this.props.router.setRouteLeaveHook(
         this.props.route,
         this.routerWillLeave
       )
     },
-
-    getInitialState() {
-      return {
-        textValue: 'ohai'
-      }
+    handleChange(e) {
+      this.setState({
+        text: e.target.value
+      })
     },
-
     routerWillLeave() {
-      if (this.state.textValue)
+      if (this.state.text)
         return 'You have unsaved information, are you sure you want to leave this page?'
     },
-
-    handleChange(event) {
+    handleSubmit(e) {
+      e.preventDefault()
       this.setState({
-        textValue: event.target.value
-      })
-    },
-
-    handleSubmit(event) {
-      event.preventDefault()
-
-      this.setState({
-        textValue: ''
-      }, () => {
+        text: ''
+      },()=>{
         this.props.router.push('/')
       })
-    },
 
-    render() {
+    },
+    render () {
       return (
-        <div>
-          <form onSubmit={this.handleSubmit}>
-            <p>Click the dashboard link with text in the input.</p>
-            <input type="text" ref="userInput" value={this.state.textValue} onChange={this.handleChange} />
-            <button type="submit">Go</button>
-          </form>
-        </div>
+        <form onSubmit={this.handleSubmit}>
+          <h1>Form</h1>
+          <input type="text" ref="userinput" value={this.state.text} onChange={this.handleChange}/>
+          <button type="submit">Go</button>
+        </form>
       )
     }
   })
@@ -78,8 +76,8 @@ const Form = withRouter(
 render((
   <Router history={withExampleBasename(browserHistory, __dirname)}>
     <Route path="/" component={App}>
-      <Route path="dashboard" component={Dashboard} />
-      <Route path="form" component={Form} />
+      <Route path="/dashboard" component={Dashbord} />
+      <Route path="/form" component={Form} />
     </Route>
   </Router>
-), document.getElementById('example'))
+),document.getElementById('example'))
