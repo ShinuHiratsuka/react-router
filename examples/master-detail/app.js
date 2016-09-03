@@ -26,7 +26,6 @@ const App = React.createClass({
   componentWillUnmount() {
     ContactStore.removeChangeListener(this.updateContacts)
   },
-
   updateContacts() {
     this.setState({
       contacts: ContactStore.getContacts(),
@@ -146,7 +145,7 @@ const NewContact = withRouter(
 
 const NotFound = React.createClass({
   render() {
-    return <h2>Not found</h2>
+    return <h2>404 not found</h2>
   }
 })
 
@@ -160,3 +159,11 @@ render((
     </Route>
   </Router>
 ), document.getElementById('example'))
+
+
+
+
+
+
+
+

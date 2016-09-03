@@ -4,7 +4,7 @@ import { Router, browserHistory } from 'react-router'
 
 import withExampleBasename from '../withExampleBasename'
 import './stubs/COURSES'
-
+console.log(COURSES)
 const rootRoute = {
   childRoutes: [ {
     path: '/',

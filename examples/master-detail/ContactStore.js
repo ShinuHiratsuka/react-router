@@ -1,41 +1,56 @@
+import fetch from './fetch'
+import post from './post'
+import destory from './delete'
 const API = 'http://addressbook-api.herokuapp.com/contacts'
-
-let _contacts = {}
 let _initCalled = false
+let _contacts = {}
 let _changeListeners = []
 
+localStorage.token = localStorage.token || (Date.now()*Math.random())
+
 const ContactStore = {
-
-  init: function () {
-    if (_initCalled)
-      return
-
+  init : () => {
+    if(_initCalled) return
     _initCalled = true
-
-    getJSON(API, function (err, res) {
-      res.contacts.forEach(function (contact) {
+    fetch(API,{
+      authorization: localStorage.token
+    }).then((res)=>{
+      res.contacts.forEach((contact) =>{
         _contacts[contact.id] = contact
       })
-
       ContactStore.notifyChange()
     })
+    
   },
-
-  addContact: function (contact, cb) {
-    postJSON(API, { contact: contact }, function (res) {
+  addContact: (contact, cd) => {
+    post(API, {
+      authorization: localStorage.token,
+      send: {
+        contact: contact
+      }
+    }).then((res)=>{
       _contacts[res.contact.id] = res.contact
       ContactStore.notifyChange()
-      if (cb) cb(res.contact)
+      if(cd) {
+        cd(res.contact)
+      }
     })
   },
-
-  removeContact: function (id, cb) {
-    deleteJSON(API + '/' + id, cb)
-    delete _contacts[id]
-    ContactStore.notifyChange()
+  notifyChange: () => {
+    _changeListeners.forEach(function (listener) {
+      listener()
+    })
+  },
+  addChangeListener:  (listener) => {
+    _changeListeners.push(listener)
   },
 
-  getContacts: function () {
+  removeChangeListener: (listener) => {
+    _changeListeners = _changeListeners.filter(function (l) {
+      return listener !== l
+    })
+  },
+  getContacts : () => {
     const array = []
 
     for (const id in _contacts)
@@ -43,62 +58,20 @@ const ContactStore = {
 
     return array
   },
-
-  getContact: function (id) {
+  getContact : (id) => {
     return _contacts[id]
   },
-
-  notifyChange: function () {
-    _changeListeners.forEach(function (listener) {
-      listener()
-    })
-  },
-
-  addChangeListener: function (listener) {
-    _changeListeners.push(listener)
-  },
-
-  removeChangeListener: function (listener) {
-    _changeListeners = _changeListeners.filter(function (l) {
-      return listener !== l
+  removeContact : (id)=> {
+    destory(API + '/' + id, {
+      authorization: localStorage.token
+    }).then((res)=>{
+      delete _contacts[id]
+      ContactStore.notifyChange()
     })
   }
-
 }
 
-localStorage.token = localStorage.token || (Date.now()*Math.random())
 
-function getJSON(url, cb) {
-  const req = new XMLHttpRequest()
-  req.onload = function () {
-    if (req.status === 404) {
-      cb(new Error('not found'))
-    } else {
-      cb(null, JSON.parse(req.response))
-    }
-  }
-  req.open('GET', url)
-  req.setRequestHeader('authorization', localStorage.token)
-  req.send()
-}
+export default ContactStore;
 
-function postJSON(url, obj, cb) {
-  const req = new XMLHttpRequest()
-  req.onload = function () {
-    cb(JSON.parse(req.response))
-  }
-  req.open('POST', url)
-  req.setRequestHeader('Content-Type', 'application/json;charset=UTF-8')
-  req.setRequestHeader('authorization', localStorage.token)
-  req.send(JSON.stringify(obj))
-}
 
-function deleteJSON(url, cb) {
-  const req = new XMLHttpRequest()
-  req.onload = cb
-  req.open('DELETE', url)
-  req.setRequestHeader('authorization', localStorage.token)
-  req.send()
-}
-
-export default ContactStore
